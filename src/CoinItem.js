@@ -8,7 +8,7 @@ function CoinItem({ coin }) {
         <Image style={styles.coinImage} source={{ uri: coin.image }} />
         <Text style={styles.coinText}>{coin.name}</Text>
       </View>
-      <Text style={styles.coinText}>$100000</Text>
+      <Text style={styles.coinText}>$1000000</Text>
     </View>
   );
 }
