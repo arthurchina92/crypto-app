@@ -5,6 +5,9 @@ import { CoinItem } from "./CoinItem";
 
 function App() {
   const [coins, setCoins] = useState([]);
+  const [search, setSearch] = useState("");
+  const [refresh, setRefresh] = useState(false);
+
   const loadData = async () => {
     const res = await fetch(
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&sparkline=false&locale=en"
@@ -22,15 +25,30 @@ function App() {
       <StatusBar backgroundColor="#fff" />
       <View style={styles.header}>
         <Text style={styles.title}>Crypto Market</Text>
-        <TextInput style={styles.searchInput} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search a coin"
+          placeholderTextColor="#858585"
+          onChangeText={(text) => setSearch(text)}
+        />
       </View>
       <FlatList
         style={styles.list}
-        data={coins}
+        data={coins.filter(
+          (coin) =>
+            coin.name.toLowerCase().includes(search.toLowerCase()) ||
+            coin.symbol.toLowerCase().includes(search.toLowerCase())
+        )}
         renderItem={({ item }) => {
           return <CoinItem coin={item} />;
         }}
         showsVerticalScrollIndicator={false}
+        refreshing={refresh}
+        onRefresh={async () => {
+          setRefresh(true);
+          await loadData();
+          setRefresh(false);
+        }}
       />
       <StatusBar style="auto" />
     </View>
@@ -47,7 +65,6 @@ const styles = StyleSheet.create({
   title: {
     color: "#fff",
     fontSize: 25,
-    marginTop: 30,
   },
   list: {
     width: "85%",
@@ -55,11 +72,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "90%",
+    width: "85%",
     marginBottom: 15,
+    marginTop: 70,
   },
   searchInput: {
-    marginTop: 35,
+    marginTop: 15,
     color: "#fff",
     borderBottomColor: "#4657CE",
     borderBottomWidth: 1,
